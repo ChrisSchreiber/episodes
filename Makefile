@@ -1,7 +1,9 @@
+.PHONY: build clean
+
+build: clean episodes
+
 episodes:
 	go build ./ 
 
-.PHONY: clean
-
 clean:
-	rm episodes
+	rm -f episodes
