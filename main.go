@@ -17,10 +17,11 @@ func init() {
 
 func main() {
 	config := config.New()
+	log.Debug().EmbedObject(config).Msg("Config")
 
 	destination, err := directory.New(config.Destination)
 	if err != nil {
-		log.Panic().Err(err).Msg("read destination directory failed")
+		log.Fatal().Err(err).Msg("Read destination directory failed")
 	}
 
 	var source *directory.Directory
@@ -29,7 +30,7 @@ func main() {
 	} else {
 		source, err = directory.New(config.Source)
 		if err != nil {
-			log.Panic().Err(err).Msg("read source directory failed")
+			log.Fatal().Err(err).Msg("Read source directory failed")
 		}
 	}
 
@@ -48,28 +49,27 @@ func main() {
 		}
 	}
 
-	var episode show.Episode
+	var next show.Episode
 	if config.Season == 0 {
 		// get last known episode of last known season; defaults to season 1 episode 1
-		episode = destinationShow.LastEpisode()
+		next = destinationShow.NextEpisode()
 		if config.Episode != 0 {
 			// override season last episode
-			episode.EpisodeNumber = uint8(config.Episode) - 1
+			next.EpisodeNumber = uint8(config.Episode) - 1
 		}
 	} else {
 		// get known episodes for season
 		season := destinationShow.GetSeason(uint8(config.Season))
 		if config.Episode == 0 {
 			// get last known episode for season. defaults to episode 1
-			episode = season.LastEpisode()
+			next = season.NextEpisode()
 		} else {
 			// override season last episode
-			episode = show.Episode{SeasonNumber: episode.SeasonNumber, EpisodeNumber: uint8(config.Episode) - 1}
+			next = show.Episode{SeasonNumber: next.SeasonNumber, EpisodeNumber: uint8(config.Episode) - 1}
 		}
 	}
-	last := destinationShow.LastEpisode()
 
-	log.Info().Str("Show", destinationShow.Name).Uint8("Season", last.SeasonNumber).Uint8("Episode", last.EpisodeNumber).Msg("Show identified")
+	log.Info().Str("Show", destinationShow.Name).Uint8("Season", next.SeasonNumber).Uint8("Episode", next.EpisodeNumber).Msg("Next episode")
 
 	trackMatcher := track.NewMatcher(`^(.+_t)(\d{2})(\.[a-zA-Z0-9]+)?$`)
 	for _, file := range source.Files {
@@ -86,10 +86,10 @@ func main() {
 		trackMatcher.SortAscending()
 	}
 	for _, track := range trackMatcher.Tracks {
-		last.EpisodeNumber++
-		err := track.Move(config.Destination, destinationShow.Name, last, config.DryRun)
+		err := track.Move(config.Destination, destinationShow.Name, next, config.DryRun)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Move file failed")
 		}
+		next.EpisodeNumber++
 	}
 }

@@ -51,7 +51,7 @@ func TestSeasonLastEpisode(t *testing.T) {
 
 	t.Run("returns episode 1 when no episodes", func(t *testing.T) {
 		season := show.Season{Number: seasonNumber}
-		last := season.LastEpisode()
+		last := season.NextEpisode()
 		assert.Equal(t, show.Episode{SeasonNumber: seasonNumber, EpisodeNumber: 1}, last)
 	})
 
@@ -60,7 +60,7 @@ func TestSeasonLastEpisode(t *testing.T) {
 			Number:   seasonNumber,
 			Episodes: []show.Episode{{SeasonNumber: seasonNumber, EpisodeNumber: 5}},
 		}
-		last := season.LastEpisode()
+		last := season.NextEpisode()
 		assert.Equal(t, show.Episode{SeasonNumber: seasonNumber, EpisodeNumber: 5}, last)
 	})
 
@@ -73,7 +73,7 @@ func TestSeasonLastEpisode(t *testing.T) {
 				{SeasonNumber: seasonNumber, EpisodeNumber: 2},
 			},
 		}
-		last := season.LastEpisode()
+		last := season.NextEpisode()
 		assert.Equal(t, show.Episode{SeasonNumber: seasonNumber, EpisodeNumber: 7}, last)
 	})
 }

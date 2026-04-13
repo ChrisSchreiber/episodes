@@ -26,9 +26,9 @@ func (s *Show) GetSeason(number uint8) (season Season) {
 	return Season{Number: number}
 }
 
-// LastEpisode get last known episode of last known season.
+// NextEpisode get the next known episode.
 // If there are no known seasons, season 1 episode 1 is returned.
-func (s *Show) LastEpisode() (lastEpisode Episode) {
+func (s *Show) NextEpisode() (next Episode) {
 	if len(s.Seasons) == 0 {
 		return Episode{SeasonNumber: 1, EpisodeNumber: 1}
 	}
@@ -38,5 +38,5 @@ func (s *Show) LastEpisode() (lastEpisode Episode) {
 			lastSeason = season
 		}
 	}
-	return lastSeason.LastEpisode()
+	return lastSeason.NextEpisode()
 }

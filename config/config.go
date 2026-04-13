@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -44,6 +45,18 @@ type Config struct {
 	Reverse     bool
 	LogLevel    LogLevel
 	DryRun      bool
+}
+
+func (c *Config) MarshalZerologObject(log *zerolog.Event) {
+	log.
+		Str("Destination", c.Destination).
+		Str("Source", c.Source).
+		Str("Show", c.Show).
+		Uint("Season", c.Season).
+		Uint("Episode", c.Episode).
+		Bool("Reverse", c.Reverse).
+		Str("LogLevel", string(c.LogLevel)).
+		Bool("DryRun", c.DryRun)
 }
 
 func usage() {
