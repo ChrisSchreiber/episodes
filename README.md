@@ -1,2 +1,3 @@
-# episodes
-Rename files with series name, season and episode 
+# Episodes
+
+Rename files with series name, season and episode
