@@ -19,6 +19,7 @@ func New() *Config {
 	flag.UintVar(&config.Season, "season", 0, "Season to add new episodes to. (default: Season is determined from files in destination directory)")
 	flag.UintVar(&config.Episode, "episode", 0, "Episode number to start at. (default: Start episode is determined from files in destination directory)")
 	flag.BoolVar(&config.Reverse, "reverse", false, "Reverse track order. Highest number track is next episode.")
+	flag.Var(&config.LogLevel, "log-level", "Log level. (debug|info|warn|error|fatal|disabled; default: info)")
 	flag.BoolVar(&config.DryRun, "dry-run", false, "Display source and destination files but do not rename.")
 
 	flag.Parse()
@@ -41,6 +42,7 @@ type Config struct {
 	Season      uint
 	Episode     uint
 	Reverse     bool
+	LogLevel    LogLevel
 	DryRun      bool
 }
 
