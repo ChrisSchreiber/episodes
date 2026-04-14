@@ -2,7 +2,6 @@ package file
 
 import (
 	"os"
-	"regexp"
 )
 
 func New(path string, entry os.DirEntry) *File {
@@ -12,8 +11,4 @@ func New(path string, entry os.DirEntry) *File {
 type File struct {
 	Path  string
 	Entry os.DirEntry
-}
-
-func (f *File) Match(pattern *regexp.Regexp) []string {
-	return pattern.FindStringSubmatch(f.Entry.Name())
 }

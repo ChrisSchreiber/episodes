@@ -20,15 +20,16 @@ func (s *Season) AddEpisode(episodeNumber uint8) {
 	}
 }
 
-// LastEpisode get last known episode. If there are no known episodes return episode 1.
-func (s *Season) LastEpisode() (lastEpisode Episode) {
+// NextEpisode get last known episode. If there are no known episodes return episode 1.
+func (s *Season) NextEpisode() (next Episode) {
 	if len(s.Episodes) == 0 {
 		return Episode{SeasonNumber: s.Number, EpisodeNumber: 1}
 	}
 	for _, episode := range s.Episodes {
-		if episode.EpisodeNumber > lastEpisode.EpisodeNumber {
-			lastEpisode = episode
+		if episode.EpisodeNumber > next.EpisodeNumber {
+			next = episode
 		}
 	}
+	next.EpisodeNumber++
 	return
 }
