@@ -62,14 +62,14 @@ func TestShowGetSeason(t *testing.T) {
 	})
 }
 
-func TestShowLastEpisode(t *testing.T) {
+func TestShowNextEpisode(t *testing.T) {
 	t.Run("returns season 1 episode 1 when no seasons", func(t *testing.T) {
 		s := show.Show{Name: gofakeit.Animal()}
-		last := s.NextEpisode()
-		assert.Equal(t, show.Episode{SeasonNumber: 1, EpisodeNumber: 1}, last)
+		next := s.NextEpisode()
+		assert.Equal(t, show.Episode{SeasonNumber: 1, EpisodeNumber: 1}, next)
 	})
 
-	t.Run("returns last episode of only season", func(t *testing.T) {
+	t.Run("returns next episode after last of only season", func(t *testing.T) {
 		s := show.Show{
 			Name: gofakeit.Animal(),
 			Seasons: []show.Season{
@@ -79,11 +79,11 @@ func TestShowLastEpisode(t *testing.T) {
 				}},
 			},
 		}
-		last := s.NextEpisode()
-		assert.Equal(t, show.Episode{SeasonNumber: 3, EpisodeNumber: 5}, last)
+		next := s.NextEpisode()
+		assert.Equal(t, show.Episode{SeasonNumber: 3, EpisodeNumber: 6}, next)
 	})
 
-	t.Run("returns last episode of highest season", func(t *testing.T) {
+	t.Run("returns next episode after last of highest season", func(t *testing.T) {
 		s := show.Show{
 			Name: gofakeit.Animal(),
 			Seasons: []show.Season{
@@ -95,7 +95,7 @@ func TestShowLastEpisode(t *testing.T) {
 				}},
 			},
 		}
-		last := s.NextEpisode()
-		assert.Equal(t, show.Episode{SeasonNumber: 2, EpisodeNumber: 10}, last)
+		next := s.NextEpisode()
+		assert.Equal(t, show.Episode{SeasonNumber: 2, EpisodeNumber: 11}, next)
 	})
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"episodes/config"
 	"episodes/directory"
+	"episodes/matcher"
 	"episodes/show"
 	"episodes/track"
 	"os"
@@ -34,16 +35,19 @@ func main() {
 		}
 	}
 
-	showMatcher := show.NewMatcher(`^(.*)-S(\d{2})E(\d{2})(\.[a-zA-Z0-9]+)?$`, destination)
+	showList, err := show.NewList(*destination, *matcher.New(matcher.WithShowPatterns()))
+	if err != nil {
+		log.Fatal().Err(err).Msg("Read show files from destination failed")
+	}
 
 	var destinationShow *show.Show
 	if config.Show == "" {
-		destinationShow, err = showMatcher.GetDefault()
+		destinationShow, err = showList.GetDefault()
 		if err != nil {
 			log.Fatal().Err(err).Msg("Could not determin show name from existing files")
 		}
 	} else {
-		destinationShow = showMatcher.Get(config.Show)
+		destinationShow = showList.Get(config.Show)
 		if destinationShow == nil {
 			destinationShow = &show.Show{Name: config.Show}
 		}
@@ -71,21 +75,22 @@ func main() {
 
 	log.Info().Str("Show", destinationShow.Name).Uint8("Season", next.SeasonNumber).Uint8("Episode", next.EpisodeNumber).Msg("Next episode")
 
-	trackMatcher := track.NewMatcher(`^(.+_t)(\d{2})(\.[a-zA-Z0-9]+)?$`)
-	for _, file := range source.Files {
-		trackMatcher.Check(file)
+	tracks := new(track.List)
+	err = tracks.FromDirectory(source, matcher.New(matcher.WithTrackPatterns()))
+	if err != nil {
+		log.Fatal().Err(err).Msg("Read tracks from source directory failed")
 	}
 
-	if len(trackMatcher.Tracks) == 0 {
+	if len(tracks.Tracks) == 0 {
 		log.Fatal().Msg("Tracks not found")
 	}
 
 	if config.Reverse {
-		trackMatcher.SortDescending()
+		tracks.SortDescending()
 	} else {
-		trackMatcher.SortAscending()
+		tracks.SortAscending()
 	}
-	for _, track := range trackMatcher.Tracks {
+	for _, track := range tracks.Tracks {
 		err := track.Move(config.Destination, destinationShow.Name, next, config.DryRun)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Move file failed")
